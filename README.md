@@ -1,4 +1,4 @@
-# ⚖️ AI Legal Assistant - Indonesian Law
+# ⚖️ AI Legal Assistant - Indonesian Law (Enterprise Ready)
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
@@ -6,29 +6,36 @@
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![LlamaIndex](https://img.shields.io/badge/LlamaIndex-Advanced_RAG-orange?style=for-the-badge)
 
-An intelligent chatbot designed to assist users in understanding Indonesian Law regulations. Unlike traditional chatbots, this system employs **Advanced RAG (Retrieval-Augmented Generation)** with **Re-ranking** capabilities to ensure high accuracy and context-aware responses based on official legal documents (UU LLAJ, etc.).
+An intelligent, scalable chatbot designed to assist users in understanding Indonesian Law regulations. Employs **Advanced RAG** with **Re-ranking** to ensure high accuracy and context-aware responses based on official legal documents.
+
+---
+
+## 🚀 Architectural Upgrades (Production Ready)
+- **Scalable Vector DB:** Migrated from local SQLite to a standalone **ChromaDB Client/Server** architecture within Docker Compose.
+- **Asynchronous Execution:** Implemented `achat()` in FastAPI via LlamaIndex to unblock event loops, allowing the handling of high concurrent requests (50+ users).
+- **Security Enhancements:** Integrated `slowapi` for Rate Limiting and strict `X-API-Key` headers to protect endpoints from abuse, spam, and injection attempts.
+- **Centralized Config:** Adopted `pydantic-settings` to manage environments cleanly without violating the DRY principle.
 
 ---
 
 ##  Key Features
 
-* **Advanced RAG Architecture:** Uses a retrieve-then-rerank approach to fetch the most relevant legal articles before generating answers.
-* **High-Performance LLM:** Powered by **Llama 3** (via Groq API) for fast and accurate reasoning.
-* **Transparent Citations:** Every answer includes references to the specific legal documents and page numbers used.
-* **Dockerized:** Fully containerized with Docker Compose for easy deployment and scalability.
-* **Monitoring:** Integrated with LangSmith/Terminal Logging for tracking token usage and latency.
+* **Advanced RAG Architecture:** Uses a retrieve-then-rerank approach.
+* **High-Performance LLM:** Powered by **Llama 3** (via Groq API).
+* **Transparent Citations:** Provides specific legal documents and page numbers.
+* **Dockerized:** Fully containerized backend, frontend, and ChromaDB server.
+* **Robust API Layer:** Centralized dependency injection, safe error handling, and robust Pydantic input validation.
 
 ---
 
 ## Tech Stack
 
-* **Core Framework:** [LlamaIndex](https://www.llamaindex.ai/)
-* **LLM Provider:** [Groq](https://groq.com/) (Llama 3.3 model)
-* **Vector Database:** [ChromaDB](https://www.trychroma.com/) (Persistent storage)
-* **Embedding Model:** HuggingFace (`sentence-transformers`)
-* **Backend:** FastAPI
+* **Core Framework:** LlamaIndex
+* **LLM Provider:** Groq
+* **Vector Database:** ChromaDB Server
+* **Embedding Model:** HuggingFace
+* **Backend:** FastAPI, Pydantic Settings, SlowAPI
 * **Frontend:** Streamlit
-* **DevOps:** Docker & Docker Compose
 
 ---
 
@@ -36,10 +43,13 @@ An intelligent chatbot designed to assist users in understanding Indonesian Law 
 
 ```bash
 Legal-Chatbot/
-├── backend/             # FastAPI Server & RAG Engine
+├── backend/
+│   └── app/
+│       ├── config.py    # Centralized Configuration
+│       ├── api.py       # API Endpoints & Security
+│       ├── engine.py    # RAG Logic
+│       └── ingest.py    # Data ETL
 ├── frontend/            # Streamlit User Interface
-├── Data/                # PDF Legal Documents & Vector Store
-├── docker-compose.yml   # Orchestration for services
-├── Dockerfile.backend   # Backend container config
-├── Dockerfile.frontend  # Frontend container config
-└── requirements.txt     # Python dependencies
+├── Data/                # Raw PDFs & Chroma DB Volumes
+└── docker-compose.yml   # Multi-container orchestration (App + Chroma)
+```

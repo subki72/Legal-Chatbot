@@ -11,3 +11,5 @@ sentence-transformers
 pypdf
 requests
 chromadb
+pydantic-settings
+slowapi
