@@ -1,28 +1,27 @@
-import os
+import logging
 from llama_index.core import VectorStoreIndex
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.groq import Groq
 from llama_index.core.postprocessor import SentenceTransformerRerank 
 import chromadb
-from dotenv import load_dotenv
+from app.config import settings
 
-load_dotenv()
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-CHROMA_DB_DIR = os.path.join(BASE_DIR, "Data", "vector_store")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+logger = logging.getLogger(__name__)
 
 def get_chat_engine():
-    if not os.path.exists(CHROMA_DB_DIR):
-        raise ValueError(f"Database tidak ditemukan di {CHROMA_DB_DIR}")
+    try:
+        # Gunakan HttpClient untuk connect ke server Chroma
+        db = chromadb.HttpClient(host=settings.CHROMA_HOST, port=settings.CHROMA_PORT)
+        chroma_collection = db.get_collection("legal_docs")
+    except Exception as e:
+        logger.error(f"Gagal mengambil collection ChromaDB: {e}")
+        raise ValueError(f"ChromaDB error: {e}")
         
-    db = chromadb.PersistentClient(path=CHROMA_DB_DIR)
-    chroma_collection = db.get_or_create_collection("legal_docs")
     vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
     
-    # 2. Embedding Model (Sama kayak Ingest)
-    embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    # 2. Embedding Model
+    embed_model = HuggingFaceEmbedding(model_name=settings.EMBEDDING_MODEL)
     
     # 3. Load Index
     index = VectorStoreIndex.from_vector_store(
@@ -30,15 +29,15 @@ def get_chat_engine():
         embed_model=embed_model,
     )
     
-    # 4. LLM (Otak Llama 3.3)
-    llm = Groq(model="llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+    # 4. LLM
+    llm = Groq(model=settings.LLM_MODEL, api_key=settings.GROQ_API_KEY)
 
     # 5. ADVANCED RAG: Re-ranker
     reranker = SentenceTransformerRerank(
-        model="cross-encoder/ms-marco-MiniLM-L-6-v2", top_n=3
+        model=settings.RERANKER_MODEL, top_n=3
     )
 
-    # 6. Chat Engine dengan Re-ranking
+    # 6. Chat Engine
     chat_engine = index.as_chat_engine(
         chat_mode="context",
         llm=llm,

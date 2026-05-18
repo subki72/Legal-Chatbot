@@ -1,44 +1,55 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from app.engine import get_chat_engine
+from fastapi import APIRouter, HTTPException, Request, Depends, Security
+from fastapi.security.api_key import APIKeyHeader
+from pydantic import BaseModel, Field
 import time 
+import logging
+from app.config import settings
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
-print("⚙️ Memuat AI Engine...")
-chat_engine = get_chat_engine()
-print("✅ AI Engine Siap!")
+# API Key Security
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+async def get_api_key(api_key_header: str = Security(api_key_header)):
+    if api_key_header != settings.APP_API_KEY:
+        raise HTTPException(status_code=403, detail="Akses Ditolak: API Key tidak valid")
+    return api_key_header
 
 class ChatRequest(BaseModel):
-    query: str
+    query: str = Field(..., max_length=500, description="Pertanyaan pengguna, maks 500 karakter")
 
 @router.post("/chat")
-async def chat_endpoint(query: str):
+async def chat_endpoint(request: Request, body: ChatRequest, api_key: str = Depends(get_api_key)):
+    # Ambil engine dari app state (diset saat startup)
+    chat_engine = request.app.state.chat_engine
+    if not chat_engine:
+         raise HTTPException(status_code=503, detail="AI Engine belum siap")
+
+    # Terapkan rate limit pada endpoint chat secara manual karena berada dalam APIRouter
+    limiter = request.app.state.limiter
     try:
-        # 1. Mulai Monitoring (Start Stopwatch)
+        limiter.check_request_limit(request, "5/minute", "", "")
+    except Exception as e:
+        raise e
+
+    query = body.query
+    try:
         start_time = time.time()
-        print(f"\n{'='*10} PERTANYAAN BARU {'='*10}")
-        print(f"🗣️  User: {query}")
+        logger.info(f"🗣️ User IP {request.client.host} bertanya: {query[:50]}...")
         
-        # 2. Suruh AI Mikir
-        response = chat_engine.chat(query)
+        # 2. Gunakan ACHAT (Asynchronous Chat) agar tidak memblokir FastAPI
+        response = await chat_engine.achat(query)
         
-        # 3. Stop Monitoring (Hitung Durasi)
         end_time = time.time()
         latency = end_time - start_time
         
-        # 4. Hitung Token (Estimasi Kasar: 1 kata ≈ 1.3 token)
+        # 4. Hitung Token (Estimasi Kasar)
         input_tokens = len(query.split()) * 1.3
         output_tokens = len(response.response.split()) * 1.3
         total_tokens = int(input_tokens + output_tokens)
         
-        # 5. CETAK LAPORAN KE TERMINAL (Ini yang dinilai Dosen)
-        print(f"AI: {response.response[:50]}...") # Tampilin dikit jawabannya
-        print(f"\n[MONITORING DASHBOARD]")
-        print(f"  Latency (Waktu Mikir): {latency:.2f} detik")
-        print(f" Total Token Usage    : ~{total_tokens} tokens")
-        print(f"Sumber Dokumen     : {len(response.source_nodes)} referensi")
-        print(f"{'='*35}\n")
+        logger.info(f"Latency: {latency:.2f}s | Token: ~{total_tokens} | Source: {len(response.source_nodes)}")
         
         # --- Proses Data untuk Frontend ---
         answer_text = response.response
@@ -58,6 +69,9 @@ async def chat_endpoint(query: str):
             "tokens": total_tokens
         }
             
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"❌ Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"❌ Error saat memproses chat: {e}")
+        # Jangan expose real error traceback ke luar!
+        raise HTTPException(status_code=500, detail="Terjadi kendala internal server saat memproses pertanyaan Anda.")
