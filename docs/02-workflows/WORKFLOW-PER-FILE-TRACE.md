@@ -55,6 +55,7 @@
     - [Resolved Critical Issues (P0 Blockers)](#resolved-critical-issues-p0-blockers)
     - [Pembersihan Artefak Sampah (Junk Cleaned)](#pembersihan-artefak-sampah-junk-cleaned)
   - [📝 Operational Runbook Reference](#-operational-runbook-reference)
+  - [🗺️ Recommended Reading Order & Learning Path (Peta Jalur Belajar)](#️-recommended-reading-order--learning-path-peta-jalur-belajar)
 
 ---
 
@@ -469,3 +470,82 @@ Layer infrastruktur dan orkestrasi kontainer yang mendefinisikan build environme
 Untuk panduan operasional langkah demi langkah dalam menjalankan sistem dari nol (*zero to hero*) serta panduan reset dan pembersihan lingkungan setelah demo/pengujian, rujuk buku panduan resmi:
 
 👉 **[RUNBOOK.md](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/docs/01-project-documentation/RUNBOOK.md)** *(tersimpan di `docs/01-project-documentation/RUNBOOK.md`)*
+
+---
+
+## 🗺️ Recommended Reading Order & Learning Path (Peta Jalur Belajar)
+
+> **Untuk Anda & Rekan Tim yang Baru Pertama Kali Membuka Proyek Ini:**  
+> Jangan langsung membaca kode backend yang rumit! Ikuti urutan terstruktur di bawah ini agar pemahaman Anda terbangun secara bertahap dari konsep besar (*macro*), bahan baku data (*data*), alur kecerdasan (*AI engine*), lapisan proteksi (*API gateway*), antarmuka (*UI*), jaring pengaman (*testing*), hingga pengemasan sistem (*DevOps*).
+
+### 📊 Diagram Jalur Belajar (Learning Flowchart)
+
+```mermaid
+flowchart TD
+    classDef phase fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef step fill:#0f172a,stroke:#64748b,stroke-width:1px,color:#e2e8f0;
+    classDef highlight fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff,font-weight:bold;
+
+    subgraph Phase1 ["FASE 1: Fondasi Konseptual & Mental Model"]
+        F1["1. README.md & RUNBOOK.md<br/>(Tujuan Proyek & Cara Menjalankan)"]:::step
+        F2["2. docs/.../MY_NOTES.md<br/>(Analogi Kantor Hukum & Tech Stack)"]:::step
+        F1 --> F2
+    end
+
+    subgraph Phase2 ["FASE 2: Konfigurasi & Data Regulasi"]
+        F3["3. .env.example & config.py<br/>(Konfigurasi Pydantic v2 & API Keys)"]:::step
+        F4["4. Data/raw/UU No. 22/2009.pdf<br/>(Bahan Baku Hukum Primer)"]:::step
+        F2 --> F3 --> F4
+    end
+
+    subgraph Phase3 ["FASE 3: Ingestion & Vector Indexing"]
+        F5["5. backend/app/ingest.py<br/>(PDF Parsing, Chunking, & ChromaDB Load)"]:::step
+        F4 --> F5
+    end
+
+    subgraph Phase4 ["FASE 4: Otak Utama RAG (Inti Kecerdasan)"]
+        F6["6. backend/app/engine.py<br/>(Retrieve-then-Rerank & Groq LLM)"]:::highlight
+        F5 --> F6
+    end
+
+    subgraph Phase5 ["FASE 5: Helper Utilitas & API Gateway"]
+        F7["7. backend/app/utils.py<br/>(Estimasi Token, Sitasi, & Limiter)"]:::step
+        F8["8. backend/app/api.py<br/>(Auth Key, Validator, & Route /chat)"]:::step
+        F9["9. backend/main.py<br/>(FastAPI Lifespan & GET /health)"]:::step
+        F6 --> F7 --> F8 --> F9
+    end
+
+    subgraph Phase6 ["FASE 6: Antarmuka Pengguna & Interaksi"]
+        F10["10. frontend/app.py<br/>(Streamlit Chat UI & Alert Status)"]:::step
+        F9 --> F10
+    end
+
+    subgraph Phase7 ["FASE 7: Jaring Pengaman (Automated Tests)"]
+        F11["11. tests/conftest.py & tests/*.py<br/>(Mock Async Engine & 15 Pytest Tests)"]:::step
+        F10 --> F11
+    end
+
+    subgraph Phase8 ["FASE 8: DevOps & Kontainerisasi"]
+        F12["12. docker-compose.yml & Dockerfile.*<br/>(Isolasi Jaringan, Port, & Diet Frontend)"]:::step
+        F11 --> F12
+    end
+```
+
+---
+
+### 📖 Panduan Membaca Langkah demi Langkah (Step-by-Step Guide)
+
+| Urutan | Berkas yang Dibaca | Mengapa Harus Mulai dari Sini? (Fokus Pembelajaran) | "Aha! Moment" (Konsep Kunci yang Harus Dipahami) |
+|---|---|---|---|
+| **Langkah 1** | [README.md](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/README.md) & [RUNBOOK.md](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/docs/01-project-documentation/RUNBOOK.md) | Memahami **tujuan besar proyek**, problem yang diselesaikan, dan cara menyalakan aplikasi di lokal via Docker tanpa tersesat. | *"Oh, ini chatbot hukum spesifik UU No. 22/2009 yang berjalan di 3 container Docker terpisah."* |
+| **Langkah 2** | [MY_NOTES.md](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/docs/01-project-documentation/MY_NOTES.md) | Membaca analogi intuitif ("Firma Hukum Modern"), alasan teknis pemilihan library, dan ringkasan arsitektur tingkat tinggi. | *"Paham analogi peran: Streamlit resepsionis, FastAPI manajer, Chroma lemari arsip, LlamaIndex paralegal, Groq pengacara senior."* |
+| **Langkah 3** | [.env.example](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/.env.example) & [backend/app/config.py](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/backend/app/config.py) | Memahami variabel konfigurasi apa saja yang menggerakkan sistem dan bagaimana Pydantic Settings v2 memvalidasi tipe data secara ketat. | *"Aplikasi menolak jalan jika `APP_API_KEY` dan `GROQ_API_KEY` tidak tersedia di environment."* |
+| **Langkah 4** | [Data/raw/UU Nomor 22 Tahun 2009.pdf](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/Data/raw/UU%20Nomor%2022%20Tahun%202009.pdf) | Melihat langsung data regulasi sumber primer yang menjadi "otak referensi" pengetahuan AI. | *"Ini dokumen resmi 642 KB yang akan dipecah-pecah menjadi potongan pasal untuk dibaca bot."* |
+| **Langkah 5** | [backend/app/ingest.py](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/backend/app/ingest.py) | Memahami proses ETL: bagaimana PDF dibaca per halaman via `SimpleDirectoryReader`, di-embed oleh model HuggingFace, dan disimpan ke koleksi ChromaDB `legal_docs`. | *"Teks PDF tidak disimpan mentah, melainkan dikonversi menjadi vektor 384 dimensi di database Chroma."* |
+| **Langkah 6** | [backend/app/engine.py](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/backend/app/engine.py) | **INTI KECERDASAN PROYEK**: Memahami arsitektur *Retrieve-then-Rerank*: Dense retrieval (top-10), Cross-Encoder re-ranking (top-3), system prompt hukum, dan `achat()`. | *"Kunci akurasi bot ini ada di Re-ranker: mengambil 10 kandidat lalu menyaring ulang jadi 3 terbaik sebelum dikirim ke Groq LLM."* |
+| **Langkah 7** | [backend/app/utils.py](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/backend/app/utils.py) | Memahami fungsi-fungsi pembantu independen: estimasi rasio kata ke token 1.3x, format deduplikasi sitasi, pengecekan koneksi Chroma, dan shared Limiter. | *"Fungsi-fungsi pembantu sengaja dipisah murni agar mudah diuji secara modular dan tidak mengotori route handler."* |
+| **Langkah 8** | [backend/app/api.py](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/backend/app/api.py) | Memahami endpoint `/chat`: proteksi otentikasi header `X-API-Key`, rate limit 5 req/menit, validasi whitespace Pydantic, delegasi asynchronous RAG, dan penanganan ramah kuota 429. | *"Route handler hanya bertugas memvalidasi, menjaga keamanan akses, dan memanggil AI engine tanpa blocking event loop."* |
+| **Langkah 9** | [backend/main.py](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/backend/main.py) | Memahami siklus hidup server: context manager `lifespan` (pemanasan AI engine), registrasi route, dan endpoint pemantauan aktif `GET /health`. | *"Endpoint `/health` memungkinkan Docker atau orchestrator mendeteksi otomatis jika AI engine atau database offline."* |
+| **Langkah 10** | [frontend/app.py](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/frontend/app.py) | Memahami bagaimana antarmuka Streamlit mengirim request JSON ke backend, me-render chat message, menampilkan expander sitasi, dan memunculkan kotak peringatan status HTTP. | *"Frontend sepenuhnya terpisah (decoupled); jika backend dimodifikasi, UI web tidak akan rusak selama kontrak API tetap sama."* |
+| **Langkah 11** | [tests/conftest.py](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/tests/conftest.py) & Direktori [tests/](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/tests) | Memahami bagaimana seluruh sistem diuji secara otomatis dalam 0.3 detik menggunakan mock async engine tanpa membuang kuota Groq atau menyalakan Chroma. | *"15 unit test memastikan fitur keamanan, validasi Pydantic, dan logika helper tidak akan regresi atau rusak saat ada perubahan kode."* |
+| **Langkah 12** | [docker-compose.yml](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/docker-compose.yml) & [Dockerfile.*](file:///c:/Users/subki/Downloads/Project%20CV/Legal-Chatbot-main/Dockerfile.backend) | Memahami bagaimana 3 kontainer diisolasi, port Chroma ditutup dari luar, dan dependensi frontend dipangkas hingga hemat >90% (~180 MB). | *"DevOps yang matang membungkus arsitektur ini menjadi satu paket siap pakai yang bisa dijalankan oleh siapa saja di mesin mana saja."* |
