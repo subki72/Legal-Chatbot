@@ -5,8 +5,9 @@ WORKDIR /app
 # 1. Install System Libs
 RUN apt-get update && apt-get install -y build-essential --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-# 2. Install PyTorch CPU
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+# 2. Upgrade pip & Install PyTorch CPU with PyPI fallback
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch --extra-index-url https://download.pytorch.org/whl/cpu
 
 # 3. Copy dedicated backend requirements & install
 COPY backend/requirements.txt ./requirements.txt
