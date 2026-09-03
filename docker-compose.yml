@@ -23,6 +23,7 @@ services:
       - CHROMA_PORT=8000
     volumes:
       - ./Data:/app/Data
+      - hf_cache:/root/.cache/huggingface
     depends_on:
       - chromadb
 
@@ -41,3 +42,6 @@ services:
     environment:
       - BACKEND_URL=http://backend:8000
       - APP_API_KEY=${APP_API_KEY}
+
+volumes:
+  hf_cache:
