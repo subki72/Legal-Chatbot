@@ -1,6 +1,10 @@
 import streamlit as st
 import requests
 import os
+from dotenv import load_dotenv
+
+# Load environment variables dari .env jika ada
+load_dotenv()
 # 1. Konfigurasi Halaman
 st.set_page_config(
     page_title="AI Legal Assistant",
@@ -37,7 +41,11 @@ if prompt := st.chat_input("Tanya seputar UU..."):
         with st.spinner("Sedang menganalisis dokumen hukum..."):
             try:
                 backend_url = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
-                app_api_key = os.getenv("APP_API_KEY", "sk-legal-assistant-default-key-123")
+                app_api_key = os.getenv("APP_API_KEY")
+
+                if not app_api_key:
+                    st.error("❌ Konfigurasi `APP_API_KEY` tidak ditemukan di environment. Silakan set `APP_API_KEY` di file `.env`.")
+                    st.stop()
 
                 # Kirim query ke payload body sesuai spec Pydantic baru
                 payload = {"query": prompt}
@@ -71,8 +79,17 @@ if prompt := st.chat_input("Tanya seputar UU..."):
                         "extras": {"sources": sources, "latency": latency, "tokens": tokens}
                     })
                     
+                elif response.status_code == 429:
+                    error_detail = response.json().get("detail", "Batas kuota AI atau laju request tercapai.")
+                    st.warning(f"⚠️ **Rate Limit**: {error_detail}")
+                elif response.status_code == 503:
+                    st.error("⚠️ **Layanan Belum Siap**: AI Engine backend sedang offline atau belum siap.")
+                elif response.status_code == 403:
+                    st.error("🔒 **Akses Ditolak**: API Key tidak valid. Silakan periksa nilai `APP_API_KEY`.")
+                elif response.status_code == 422:
+                    st.warning("⚠️ **Input Tidak Valid**: Pertanyaan tidak boleh kosong atau melebihi 500 karakter.")
                 else:
-                    st.error(f"Gagal menghubungi backend: Error {response.status_code} - {response.text}")
+                    st.error(f"❌ Gagal menghubungi backend: Error {response.status_code} - {response.text}")
                     
             except Exception as e:
                 st.error(f"Terjadi kesalahan koneksi: {e}")

@@ -1,0 +1,31 @@
+# ==========================================
+# Docker Build Ignore
+# ==========================================
+
+# Environments & dependencies
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Git & IDEs
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Local data & temporary files
+Data/chroma/
+Data/vector_store/
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Documentation
+docs/
+CLEANUP-REPORT.md

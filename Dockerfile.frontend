@@ -2,18 +2,12 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# 1. Install PyTorch CPU duluan (Biar hemat kuota)
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+# 1. Install minimal frontend dependencies
+COPY frontend/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# 2. Install Streamlit sendirian (Karena ini yang tadi error timeout)
-RUN pip install --default-timeout=4000 --no-cache-dir streamlit
-
-# 3. Baru copy requirements dan install sisanya
-COPY requirements.txt .
-RUN pip install --default-timeout=4000 --no-cache-dir -r requirements.txt
-
-# 4. Copy sisa codingan
-COPY . .
+# 2. Copy only frontend application code
+COPY frontend/ ./frontend/
 
 EXPOSE 8501
 

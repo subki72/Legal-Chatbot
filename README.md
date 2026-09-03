@@ -10,7 +10,7 @@ An intelligent, scalable chatbot designed to assist users in understanding Indon
 
 ---
 
-## 🚀 Architectural Upgrades (Production Ready)
+##  Architectural Upgrades (Production Ready)
 - **Scalable Vector DB:** Migrated from local SQLite to a standalone **ChromaDB Client/Server** architecture within Docker Compose.
 - **Asynchronous Execution:** Implemented `achat()` in FastAPI via LlamaIndex to unblock event loops, allowing the handling of high concurrent requests (50+ users).
 - **Security Enhancements:** Integrated `slowapi` for Rate Limiting and strict `X-API-Key` headers to protect endpoints from abuse, spam, and injection attempts.
@@ -43,13 +43,31 @@ An intelligent, scalable chatbot designed to assist users in understanding Indon
 
 ```bash
 Legal-Chatbot/
-├── backend/
+├── backend/             # FastAPI REST Server & AI Engine
+│   ├── main.py          # FastAPI Entrypoint & Lifespan
+│   ├── requirements.txt # Backend dependencies
 │   └── app/
-│       ├── config.py    # Centralized Configuration
-│       ├── api.py       # API Endpoints & Security
-│       ├── engine.py    # RAG Logic
-│       └── ingest.py    # Data ETL
-├── frontend/            # Streamlit User Interface
-├── Data/                # Raw PDFs & Chroma DB Volumes
-└── docker-compose.yml   # Multi-container orchestration (App + Chroma)
+│       ├── config.py    # Pydantic v2 Settings
+│       ├── api.py       # API Endpoints, Rate Limiting & Auth
+│       ├── engine.py    # LlamaIndex RAG Pipeline
+│       ├── ingest.py    # Document ETL Ingestion
+│       └── utils.py     # Token estimation, citations & heartbeat
+├── frontend/            # Streamlit Web User Interface
+│   ├── app.py           # Streamlit Client
+│   └── requirements.txt # Lightweight frontend dependencies
+├── tests/               # Automated Testing Suite (Pytest)
+│   ├── conftest.py      # Fixtures & environment setup
+│   ├── test_api_auth.py # X-API-Key security tests
+│   ├── test_health.py   # Healthcheck & root endpoint tests
+│   ├── test_utils.py    # Core utility unit tests
+│   └── test_validation.py# Pydantic input schema validation
+├── Data/                # Raw Legal Documents (PDF) & Persistent Chroma Volume
+│   └── raw/             # Official Indonesian Laws (UU No. 22 Tahun 2009)
+├── docker-compose.yml   # Multi-container orchestration (Backend + Frontend + ChromaDB)
+├── Dockerfile.backend   # Backend container recipe
+├── Dockerfile.frontend  # Ultra-slim frontend container recipe (~180 MB)
+└── requirements.txt     # Unified developer dependencies
 ```
+
+---
+

@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, Request, Depends, Security
 from fastapi.security.api_key import APIKeyHeader
-from pydantic import BaseModel, Field
-import time 
+from pydantic import BaseModel, Field, field_validator
+import time
 import logging
 from app.config import settings
+from app.utils import estimate_tokens, format_source_citations, limiter
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -19,59 +20,61 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
 class ChatRequest(BaseModel):
     query: str = Field(..., max_length=500, description="Pertanyaan pengguna, maks 500 karakter")
 
+    @field_validator("query")
+    @classmethod
+    def validate_query_not_blank(cls, v: str) -> str:
+        trimmed = v.strip()
+        if not trimmed:
+            raise ValueError("Pertanyaan tidak boleh kosong atau hanya berisi spasi.")
+        return trimmed
+
 @router.post("/chat")
+@limiter.limit("5/minute")
 async def chat_endpoint(request: Request, body: ChatRequest, api_key: str = Depends(get_api_key)):
     # Ambil engine dari app state (diset saat startup)
     chat_engine = request.app.state.chat_engine
     if not chat_engine:
-         raise HTTPException(status_code=503, detail="AI Engine belum siap")
-
-    # Terapkan rate limit pada endpoint chat secara manual karena berada dalam APIRouter
-    limiter = request.app.state.limiter
-    try:
-        limiter.check_request_limit(request, "5/minute", "", "")
-    except Exception as e:
-        raise e
+        raise HTTPException(status_code=503, detail="AI Engine belum siap atau gagal dimuat")
 
     query = body.query
     try:
         start_time = time.time()
         logger.info(f"🗣️ User IP {request.client.host} bertanya: {query[:50]}...")
-        
-        # 2. Gunakan ACHAT (Asynchronous Chat) agar tidak memblokir FastAPI
+
+        # Gunakan ACHAT (Asynchronous Chat) agar tidak memblokir event loop FastAPI
         response = await chat_engine.achat(query)
-        
+
         end_time = time.time()
         latency = end_time - start_time
-        
-        # 4. Hitung Token (Estimasi Kasar)
-        input_tokens = len(query.split()) * 1.3
-        output_tokens = len(response.response.split()) * 1.3
-        total_tokens = int(input_tokens + output_tokens)
-        
-        logger.info(f"Latency: {latency:.2f}s | Token: ~{total_tokens} | Source: {len(response.source_nodes)}")
-        
-        # --- Proses Data untuk Frontend ---
         answer_text = response.response
-        sources = []
-        for node in response.source_nodes:
-            meta = node.node.metadata
-            file_name = meta.get('file_name', 'Dokumen')
-            page = meta.get('page_label', '?')
-            sources.append(f"{file_name} (Hal. {page})")
-        
-        sources = list(set(sources))
-            
+
+        # Format token & sitasi via utility helpers
+        total_tokens = estimate_tokens(query, answer_text)
+        sources = format_source_citations(response.source_nodes)
+
+        logger.info(f"Latency: {latency:.2f}s | Token: ~{total_tokens} | Source: {len(sources)}")
+
         return {
             "response": answer_text,
             "sources": sources,
             "latency": f"{latency:.2f}s",
             "tokens": total_tokens
         }
-            
+
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error saat memproses chat: {e}")
-        # Jangan expose real error traceback ke luar!
-        raise HTTPException(status_code=500, detail="Terjadi kendala internal server saat memproses pertanyaan Anda.")
+        err_msg = str(e)
+        logger.error(f"❌ Error saat memproses chat: {err_msg}")
+
+        # Deteksi khusus jika kuota Groq API / LLM terkena rate limit
+        if "rate_limit" in err_msg.lower() or "429" in err_msg or "quota" in err_msg.lower():
+            raise HTTPException(
+                status_code=429,
+                detail="Layanan AI sedang mencapai batas kuota (Rate Limit). Silakan tunggu 1 menit sebelum mencoba lagi."
+            )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Terjadi kendala internal server saat memproses pertanyaan Anda."
+        )

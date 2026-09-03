@@ -1,1 +1,80 @@
-.env.env\n__pycache__/\n*.pyc\n*.pyo\n*.pyd\nData/chroma/
+# ==========================================
+# Legal Chatbot RAG - Git Ignore Rules
+# ==========================================
+
+# --- Environment Variables & Secrets ---
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+!.env.example
+
+# --- Python Bytecode & Cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+*.egg
+*.egg-info/
+
+# --- Virtual Environments ---
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Testing, Coverage & Linters ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+nosetests.xml
+coverage.xml
+
+# --- Vector Database & Local Data Artifacts ---
+Data/chroma/
+Data/vector_store/
+*.sqlite3
+chroma.sqlite3
+
+# --- Operating System Artifacts ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# --- IDE & Editor Settings ---
+.idea/
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/extensions.json
+
+# --- Temporary & Log Files ---
+*.log
+*.tmp
+*.bak
+temp/
+tmp/

@@ -1,11 +1,8 @@
-version: '3.9'
-
 services:
   chromadb:
     image: chromadb/chroma:latest
     container_name: legal-chromadb
-    ports:
-      - "8001:8000"
+    restart: unless-stopped
     volumes:
       - ./Data/chroma:/chroma/chroma
     environment:
@@ -16,6 +13,7 @@ services:
       context: .
       dockerfile: Dockerfile.backend
     container_name: legal-backend
+    restart: unless-stopped
     ports:
       - "8000:8000"
     dns:
@@ -35,11 +33,15 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     container_name: legal-frontend
+    restart: unless-stopped
     ports:
       - "8501:8501"
     depends_on:
       - backend
     dns:
       - 8.8.8.8
+    env_file:
+      - .env
     environment:
       - BACKEND_URL=http://backend:8000
+      - APP_API_KEY=${APP_API_KEY}

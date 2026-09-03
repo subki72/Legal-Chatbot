@@ -8,12 +8,15 @@ RUN apt-get update && apt-get install -y build-essential --no-install-recommends
 # 2. Install PyTorch CPU
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
 
-# 3. Copy requirements & Install sisanya (Pake Timeout 2000)
-COPY requirements.txt .
+# 3. Copy dedicated backend requirements & install
+COPY backend/requirements.txt ./requirements.txt
 RUN pip install --default-timeout=4000 --no-cache-dir -r requirements.txt
 
-# 4. Copy sisa codingan
-COPY . .
+# 4. Copy backend source and dataset
+COPY backend/ ./backend/
+COPY Data/ ./Data/
+
+ENV PYTHONPATH=/app/backend
 
 EXPOSE 8000
 
