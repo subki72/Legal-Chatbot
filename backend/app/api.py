@@ -31,10 +31,17 @@ class ChatRequest(BaseModel):
 @router.post("/chat")
 @limiter.limit("5/minute")
 async def chat_endpoint(request: Request, body: ChatRequest, api_key: str = Depends(get_api_key)):
-    # Ambil engine dari app state (diset saat startup)
-    chat_engine = request.app.state.chat_engine
+    # Ambil engine dari app state (diset saat startup) atau muat on-demand
+    chat_engine = getattr(request.app.state, "chat_engine", None)
     if not chat_engine:
-        raise HTTPException(status_code=503, detail="AI Engine belum siap atau gagal dimuat")
+        try:
+            from app.engine import get_chat_engine
+            request.app.state.chat_engine = get_chat_engine()
+            chat_engine = request.app.state.chat_engine
+            logger.info("✅ AI Engine berhasil dimuat on-demand!")
+        except Exception as e:
+            logger.error(f"Gagal memuat AI Engine on-demand: {e}")
+            raise HTTPException(status_code=503, detail="AI Engine belum siap atau gagal dimuat")
 
     query = body.query
     try:

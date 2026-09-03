@@ -50,6 +50,14 @@ def root(request: Request):
 @app.get("/health")
 def health_check(request: Request):
     is_engine_ready = getattr(request.app.state, "chat_engine", None) is not None
+    if not is_engine_ready:
+        try:
+            from app.engine import get_chat_engine
+            request.app.state.chat_engine = get_chat_engine()
+            is_engine_ready = True
+        except Exception:
+            is_engine_ready = False
+
     is_chroma_alive = check_chroma_heartbeat(settings.CHROMA_HOST, settings.CHROMA_PORT)
 
     all_healthy = is_engine_ready and is_chroma_alive

@@ -32,17 +32,26 @@ def get_chat_engine():
     # 4. LLM
     llm = Groq(model=settings.LLM_MODEL, api_key=settings.GROQ_API_KEY)
 
-    # 5. ADVANCED RAG: Re-ranker
-    reranker = SentenceTransformerRerank(
-        model=settings.RERANKER_MODEL, top_n=3
-    )
+    # 5. Reranker (Opsional - aktif jika USE_RERANKER=True dan model tersedia)
+    node_postprocessors = []
+    similarity_top_k = 3
+    if getattr(settings, "USE_RERANKER", False):
+        try:
+            reranker = SentenceTransformerRerank(
+                model=settings.RERANKER_MODEL, top_n=3
+            )
+            node_postprocessors.append(reranker)
+            similarity_top_k = 10
+            logger.info("✅ Re-ranker Model berhasil diaktifkan (top_n=3, similarity_top_k=10).")
+        except Exception as e:
+            logger.warning(f"⚠️ Re-ranker tidak dapat dimuat ({e}), menggunakan Dense Retrieval top-3.")
 
     # 6. Chat Engine
     chat_engine = index.as_chat_engine(
         chat_mode="context",
         llm=llm,
-        node_postprocessors=[reranker], 
-        similarity_top_k=10, 
+        node_postprocessors=node_postprocessors, 
+        similarity_top_k=similarity_top_k, 
         system_prompt=(
             "Anda adalah asisten hukum profesional (AI Legal Assistant). "
             "Jawab pertanyaan pengguna HANYA berdasarkan konteks dokumen UU yang diberikan. "

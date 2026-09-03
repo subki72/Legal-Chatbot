@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     LLM_MODEL: str = Field(default="llama-3.3-70b-versatile")
     EMBEDDING_MODEL: str = Field(default="BAAI/bge-small-en-v1.5")
     RERANKER_MODEL: str = Field(default="cross-encoder/ms-marco-MiniLM-L-6-v2")
+    USE_RERANKER: bool = Field(default=False, description="Enable Cross-Encoder reranking if model is locally cached")
 
     # ChromaDB
     CHROMA_HOST: str = Field(default="chromadb")
