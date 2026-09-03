@@ -42,9 +42,9 @@ def get_chat_engine():
             )
             node_postprocessors.append(reranker)
             similarity_top_k = 10
-            logger.info("✅ Re-ranker Model berhasil diaktifkan (top_n=3, similarity_top_k=10).")
+            logger.info(" Re-ranker Model berhasil diaktifkan (top_n=3, similarity_top_k=10).")
         except Exception as e:
-            logger.warning(f"⚠️ Re-ranker tidak dapat dimuat ({e}), menggunakan Dense Retrieval top-3.")
+            logger.warning(f" Re-ranker tidak dapat dimuat ({e}), menggunakan Dense Retrieval top-3.")
 
     # 6. Chat Engine
     chat_engine = index.as_chat_engine(
