@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     APP_API_KEY: str = Field(..., description="Secret key required for X-API-Key header authentication")
 
     # Models
-    LLM_MODEL: str = Field(default="llama-3.3-70b-versatile")
+    LLM_MODEL: str = Field(default="qwen/qwen3.8-27b")
     EMBEDDING_MODEL: str = Field(default="BAAI/bge-small-en-v1.5")
     RERANKER_MODEL: str = Field(default="cross-encoder/ms-marco-MiniLM-L-6-v2")
     USE_RERANKER: bool = Field(default=False, description="Enable Cross-Encoder reranking if model is locally cached")

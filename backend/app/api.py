@@ -48,6 +48,10 @@ async def chat_endpoint(request: Request, body: ChatRequest, api_key: str = Depe
         start_time = time.time()
         logger.info(f"🗣️ User IP {request.client.host} bertanya: {query[:50]}...")
 
+        # Reset memory state internal chat_engine agar tidak terkontaminasi pertanyaan sebelumnya
+        if hasattr(chat_engine, "reset"):
+            chat_engine.reset()
+
         # Gunakan ACHAT (Asynchronous Chat) agar tidak memblokir event loop FastAPI
         response = await chat_engine.achat(query)
 

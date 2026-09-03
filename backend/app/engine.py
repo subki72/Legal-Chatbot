@@ -34,7 +34,7 @@ def get_chat_engine():
 
     # 5. Reranker (Opsional - aktif jika USE_RERANKER=True dan model tersedia)
     node_postprocessors = []
-    similarity_top_k = 3
+    similarity_top_k = 6
     if getattr(settings, "USE_RERANKER", False):
         try:
             reranker = SentenceTransformerRerank(

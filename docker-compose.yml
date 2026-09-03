@@ -22,8 +22,9 @@ services:
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
     volumes:
+      - ./backend:/app/backend
       - ./Data:/app/Data
-      - hf_cache:/root/.cache/huggingface
+      - hf_cache:/root/.cache
     depends_on:
       - chromadb
 
@@ -35,6 +36,8 @@ services:
     restart: unless-stopped
     ports:
       - "8501:8501"
+    volumes:
+      - ./frontend:/app/frontend
     depends_on:
       - backend
     env_file:
