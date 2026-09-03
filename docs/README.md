@@ -10,6 +10,7 @@ Selamat datang di direktori dokumentasi terpusat untuk proyek **Legal Chatbot RA
 docs/
 ├── README.md                     # File indeks navigasi dokumentasi ini
 ├── 01-project-documentation/     # Spesifikasi proyek, arsitektur, dan referensi sistem
+│   ├── MY_NOTES.md               # 🧠 Peta mental arsitektur & pemahaman sistem lengkap
 │   └── RUNBOOK.md                # 🚀 Panduan operasional dari nol & reset total
 ├── 02-workflows/                 # Alur data detail per-file dan trace end-to-end
 │   └── WORKFLOW-PER-FILE-TRACE.md
