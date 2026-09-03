@@ -78,3 +78,6 @@ Desktop.ini
 *.bak
 temp/
 tmp/
+
+# --- Local Documentation (Kept local, do not push to remote) ---
+docs/
