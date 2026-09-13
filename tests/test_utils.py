@@ -1,22 +1,26 @@
 from unittest.mock import MagicMock
-from app.utils import estimate_tokens, format_source_citations, check_chroma_heartbeat
+from app.utils import check_chroma_heartbeat, estimate_tokens, format_source_citations
+
 
 def test_estimate_tokens_normal():
-    """Menguji estimasi token pada query dan jawaban normal."""
-    query = "Apa sanksi pasal 281?"
-    answer = "Sanksinya pidana kurungan paling lama 4 bulan."
+    """Test token estimation on standard query and response text."""
+    query = "What is the penalty for Article 281?"
+    answer = "The sanction is imprisonment for up to 4 months."
     tokens = estimate_tokens(query, answer)
-    # query: 4 kata * 1.3 = 5.2; answer: 7 kata * 1.3 = 9.1; total: int(14.3) = 14
+    # query: 7 words * 1.3 = 9.1; answer: 9 words * 1.3 = 11.7; total: int(20.8) = 20
     assert tokens > 0
-    assert tokens == 14
+    assert tokens == 20
+
 
 def test_estimate_tokens_empty():
-    """Menguji estimasi token jika input kosong."""
+    """Test token estimation when inputs are empty strings."""
     tokens = estimate_tokens("", "")
     assert tokens == 0
 
+
 def test_format_source_citations_with_duplicates():
-    """Menguji bahwa format_source_citations melakukan deduplikasi dan sorting dengan benar."""
+    """Test that format_source_citations deduplicates and sorts references alphabetically."""
+
     class MockNode:
         def __init__(self, file_name, page_label):
             self.metadata = {"file_name": file_name, "page_label": page_label}
@@ -27,26 +31,27 @@ def test_format_source_citations_with_duplicates():
 
     source_nodes = [
         MockSource("UU Nomor 22 Tahun 2009.pdf", "15"),
-        MockSource("UU Nomor 22 Tahun 2009.pdf", "15"),  # duplikat
+        MockSource("UU Nomor 22 Tahun 2009.pdf", "15"),  # duplicate
         MockSource("UU Nomor 22 Tahun 2009.pdf", "88"),
-        MockSource("UU Lain.pdf", "1")
+        MockSource("Other_Statute.pdf", "1"),
     ]
 
     citations = format_source_citations(source_nodes)
 
     assert len(citations) == 3
-    assert "UU Nomor 22 Tahun 2009.pdf (Hal. 15)" in citations
-    assert "UU Nomor 22 Tahun 2009.pdf (Hal. 88)" in citations
-    assert "UU Lain.pdf (Hal. 1)" in citations
-    # Verifikasi pengurutan alfabetis
+    assert "UU Nomor 22 Tahun 2009.pdf (Page 15)" in citations
+    assert "UU Nomor 22 Tahun 2009.pdf (Page 88)" in citations
+    assert "Other_Statute.pdf (Page 1)" in citations
     assert citations == sorted(citations)
 
+
 def test_format_source_citations_empty():
-    """Menguji format_source_citations pada list kosong."""
+    """Test format_source_citations when input list is empty."""
     citations = format_source_citations([])
     assert citations == []
 
+
 def test_check_chroma_heartbeat_offline():
-    """Menguji bahwa pengecekan heartbeat ke host/port mati mengembalikan False secara aman."""
+    """Verify that heartbeat probe returns False safely when target service is unreachable."""
     is_alive = check_chroma_heartbeat(host="127.0.0.1", port=59999)
     assert is_alive is False

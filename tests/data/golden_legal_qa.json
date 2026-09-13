@@ -1,0 +1,122 @@
+[
+  {
+    "id": "QA-01",
+    "topic": "SIM - Tidak Memiliki SIM",
+    "query": "Apa sanksi bagi pengendara yang tidak memiliki SIM?",
+    "target_pasal": "Pasal 281",
+    "expected_keywords": ["kurungan", "4 bulan", "1.000.000", "denda"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-02",
+    "topic": "SIM - Tidak Dapat Menunjukkan SIM",
+    "query": "Berapa denda jika memiliki SIM tetapi tidak dapat menunjukkannya saat razia?",
+    "target_pasal": "Pasal 288",
+    "expected_keywords": ["250.000", "kurungan", "1 bulan"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-03",
+    "topic": "Helm Standar Nasional Indonesia",
+    "query": "Apa dasar hukum kewajiban mengenakan helm SNI bagi pengendara motor?",
+    "target_pasal": "Pasal 291",
+    "expected_keywords": ["Standar Nasional Indonesia", "SNI", "250.000", "kurungan"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-04",
+    "topic": "Lampu Utama Siang Hari",
+    "query": "Apakah pengendara sepeda motor wajib menyalakan lampu di siang hari dan apa sanksinya?",
+    "target_pasal": "Pasal 293",
+    "expected_keywords": ["siang hari", "100.000", "15 hari"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-05",
+    "topic": "Batas Kecepatan",
+    "query": "Apa ancaman pidana jika mengemudi melebihi batas kecepatan paling tinggi?",
+    "target_pasal": "Pasal 287",
+    "expected_keywords": ["kecepatan", "500.000", "2 bulan"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-06",
+    "topic": "Rambu Lalu Lintas dan Marka",
+    "query": "Apa sanksi melanggar aturan perintah atau larangan yang dinyatakan dengan Rambu Lalu Lintas?",
+    "target_pasal": "Pasal 287",
+    "expected_keywords": ["rambu", "marka", "500.000", "2 bulan"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-07",
+    "topic": "Penggunaan Ponsel / Mengemudi Tidak Wajar",
+    "query": "Bagaimana hukumnya bermain HP atau ponsel saat mengendarai kendaraan bermotor?",
+    "target_pasal": "Pasal 283",
+    "expected_keywords": ["tidak wajar", "konsentrasi", "750.000", "3 bulan"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-08",
+    "topic": "Plat Nomor / TNKB",
+    "query": "Berapa denda tidak memasang plat nomor atau Tanda Nomor Kendaraan Bermotor?",
+    "target_pasal": "Pasal 280",
+    "expected_keywords": ["tanda nomor kendaraan", "500.000", "2 bulan"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-09",
+    "topic": "Kaca Spion Sepeda Motor",
+    "query": "Apakah sepeda motor wajib dipasang spion dan apa hukumannya jika tidak ada?",
+    "target_pasal": "Pasal 285",
+    "expected_keywords": ["kaca spion", "250.000", "1 bulan"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-10",
+    "topic": "Tabrak Lari",
+    "query": "Apa hukuman bagi pelaku tabrak lari yang tidak menghentikan kendaraannya?",
+    "target_pasal": "Pasal 312",
+    "expected_keywords": ["menolong", "3 tahun", "75.000.000", "penjara"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-11",
+    "topic": "Mengemudi Membahayakan Nyawa",
+    "query": "Bagaimana ancaman hukuman bagi orang yang mengemudi dengan cara membahayakan nyawa orang lain?",
+    "target_pasal": "Pasal 311",
+    "expected_keywords": ["membahayakan", "penjara", "denda"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-12",
+    "topic": "Hak Pejalan Kaki",
+    "query": "Apa hak utama pejalan kaki dalam berlalu lintas?",
+    "target_pasal": "Pasal 131",
+    "expected_keywords": ["trotoar", "penyeberangan", "fasilitas"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-13",
+    "topic": "Persyaratan Usia SIM A",
+    "query": "Berapa batas usia minimal untuk mendapatkan Surat Izin Mengemudi (SIM) Golongan A?",
+    "target_pasal": "Pasal 81",
+    "expected_keywords": ["17", "tahun"],
+    "is_in_scope": true
+  },
+  {
+    "id": "QA-14",
+    "topic": "Out-of-Scope: Pesangon Ketenagakerjaan",
+    "query": "Berapa bulan pesangon yang harus dibayar perusahaan jika karyawan di-PHK?",
+    "target_pasal": null,
+    "expected_keywords": ["tidak", "dokumen", "lalu lintas", "maaf"],
+    "is_in_scope": false
+  },
+  {
+    "id": "QA-15",
+    "topic": "Out-of-Scope: Pencurian HP KUHP",
+    "query": "Berapa tahun hukuman pasal pencurian handphone menurut KUHP?",
+    "target_pasal": null,
+    "expected_keywords": ["tidak", "dokumen", "lalu lintas", "maaf"],
+    "is_in_scope": false
+  }
+]

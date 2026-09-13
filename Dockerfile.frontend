@@ -6,8 +6,15 @@ WORKDIR /app
 COPY frontend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 2. Copy only frontend application code
-COPY frontend/ ./frontend/
+# 2. Create unprivileged appuser (Non-Root Hardening)
+RUN groupadd -g 1000 appuser && \
+    useradd -u 1000 -g appuser -m -s /bin/bash appuser && \
+    chown -R appuser:appuser /app
+
+# 3. Copy only frontend application code
+COPY --chown=appuser:appuser frontend/ ./frontend/
+
+USER appuser
 
 EXPOSE 8501
 

@@ -1,12 +1,19 @@
 services:
   chromadb:
-    image: chromadb/chroma:latest
+    image: chromadb/chroma:0.6.3
     container_name: legal-chromadb
     restart: unless-stopped
     volumes:
       - ./Data/chroma:/chroma/chroma
     environment:
       - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat')\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   backend:
     build:
@@ -16,17 +23,34 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .env
     environment:
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5:7b}
+      - OLLAMA_TIMEOUT=${OLLAMA_TIMEOUT:-300.0}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - HF_HUB_DISABLE_XET=1
+      - HF_HOME=/home/appuser/.cache/huggingface
+      - LLAMA_INDEX_CACHE_DIR=/home/appuser/.cache/llama_index
     volumes:
       - ./backend:/app/backend
       - ./Data:/app/Data
-      - hf_cache:/root/.cache
+      - hf_cache:/home/appuser/.cache
     depends_on:
-      - chromadb
+      chromadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 25s
 
   frontend:
     build:
@@ -39,12 +63,25 @@ services:
     volumes:
       - ./frontend:/app/frontend
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     env_file:
       - .env
     environment:
       - BACKEND_URL=http://backend:8000
       - APP_API_KEY=${APP_API_KEY}
+
+  gateway:
+    image: nginx:1.25-alpine
+    container_name: legal-gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
 
 volumes:
   hf_cache:

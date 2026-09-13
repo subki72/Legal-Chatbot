@@ -72,12 +72,14 @@ Desktop.ini
 .vscode/*
 !.vscode/extensions.json
 
-# --- Temporary & Log Files ---
+# --- Temporary, Log & Backup Files ---
 *.log
 *.tmp
 *.bak
 temp/
 tmp/
+backups/
+*.tar.gz
 
 # --- Local Documentation (Kept local, do not push to remote) ---
 docs/
