@@ -26,7 +26,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
@@ -66,7 +67,8 @@ services:
       backend:
         condition: service_healthy
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       - BACKEND_URL=http://backend:8000
       - APP_API_KEY=${APP_API_KEY}

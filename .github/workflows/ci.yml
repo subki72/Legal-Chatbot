@@ -32,9 +32,16 @@ jobs:
           pip install -r backend/requirements.txt
           pip install pytest httpx
 
+      - name: Create CI Environment File for Docker Compose Validation
+        run: |
+          # Provide a minimal .env so docker compose config can resolve all variables
+          cp .env.example .env
+          sed -i 's/^APP_API_KEY=.*/APP_API_KEY=ci-test-secret-key-123/' .env
+          sed -i 's/^GROQ_API_KEY=.*/GROQ_API_KEY=ci-test-groq-key-456/' .env
+
       - name: Validate Docker Compose Configuration
         run: |
-          docker compose config
+          docker compose config --quiet
 
       - name: Execute Pytest Suite (Unit & Evaluation Tests)
         env:
