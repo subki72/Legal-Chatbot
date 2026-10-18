@@ -1,5 +1,7 @@
 # Indonesian Legal RAG Intelligence System
 
+[![CI Pipeline](https://github.com/subki72/Legal-Chatbot/actions/workflows/ci.yml/badge.svg)](https://github.com/subki72/Legal-Chatbot/actions)
+[![Maturity Grade: Production](https://img.shields.io/badge/Maturity%20Grade-Production%20(74.8%2F100)-success.svg)](https://github.com/subki72/Legal-Chatbot)
 ![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-blue?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
@@ -7,6 +9,7 @@
 ![Docker](https://img.shields.io/badge/Docker-Multi--Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![LlamaIndex](https://img.shields.io/badge/LlamaIndex-Advanced_RAG-orange?style=for-the-badge)
 ![Tests](https://img.shields.io/badge/Tests-26%2F26%20Passed-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)
+
 ![Code Style](https://img.shields.io/badge/Code%20Style-Senior%20Standards-black?style=for-the-badge)
 
 An enterprise production-grade AI statutory legal assistant built for compliance verification and regulatory literacy using **Indonesian Law No. 22 of 2009 (Road Traffic and Road Transportation)**.
@@ -165,6 +168,13 @@ docker compose stop
 # Restart stopped containers
 docker compose start
 
+# Single-Command Local Automation (Makefile):
+make install       # Install pinned locked dependencies
+make test          # Run 26 automated unit and evaluation tests
+make lint          # Run Ruff static code analysis
+make run           # Launch FastAPI backend service locally
+make docker-build  # Build production hardened Docker container
+
 # Stop and remove all containers and volumes
 docker compose down -v
 ```
@@ -176,8 +186,12 @@ docker compose down -v
 ```
 Legal-Chatbot/
 ├── .github/
+│   ├── dependabot.yml              # Automated weekly dependency vulnerability scanner
 │   └── workflows/
-│       └── ci.yml                  # GitHub Actions CI: lint, compose validation, pytest
+│       └── ci.yml                  # GitHub Actions CI: lint, compose validation, pytest, Trivy
+├── src/                            # Modular production architecture facade
+│   ├── __init__.py                 # Package identifier
+│   └── chatbot.py                  # Public legal assistant interface
 ├── backend/
 │   ├── main.py                     # FastAPI entrypoint, lifespan, health check
 │   ├── requirements.txt            # Backend dependencies with version bounds
@@ -212,15 +226,34 @@ Legal-Chatbot/
 │   ├── 01-project-documentation/   # Operational runbook and deployment guide
 │   ├── 02-workflows/               # Implementation tracing and per-file workflow logs
 │   └── 04-audits-logs/             # Production readiness audit reports
-├── docker-compose.yml              # 4-service orchestration (ChromaDB, Backend, Frontend, Gateway)
-├── Dockerfile.backend              # Hardened non-root backend image
-├── Dockerfile.frontend             # Hardened non-root Streamlit image
 ├── .env.example                    # Configuration template
-└── requirements.txt                # Unified developer dependencies
+├── .pre-commit-config.yaml         # Pre-commit quality & hygiene hooks
+├── CHANGELOG.md                    # Keep a Changelog semantic release history
+├── CONTRIBUTING.md                 # Contribution and peer review guidelines
+├── docker-compose.yml              # 4-service orchestration (ChromaDB, Backend, Frontend, Gateway)
+├── Dockerfile                      # Production hardened non-root containerfile
+├── Dockerfile.backend              # Backend container specification
+├── Dockerfile.frontend             # Streamlit container specification
+├── LICENSE                         # Formal MIT open-source license
+├── Makefile                        # Single-command workflow automation
+├── requirements.txt                # Strictly pinned production dependencies manifest
+├── requirements-lock.txt           # Deterministic locked dependencies
+├── ruff.toml                       # Ruff linter and formatter configuration
+└── uv.lock                         # Fast deterministic uv lockfile
 ```
+
+---
+
+## Security & Governance
+
+- **Vulnerability Reporting**: See [SECURITY.md](SECURITY.md) for our responsible disclosure policy.
+- **Contribution Guidelines**: Setup workflow and pull request standards in [CONTRIBUTING.md](CONTRIBUTING.md).
+- **Changelog**: Semantic versioning and upgrade notes in [CHANGELOG.md](CHANGELOG.md).
+- **License**: Explicitly licensed under the [MIT License](LICENSE).
 
 ---
 
 ## Legal Disclaimer
 
 This system is an informational and regulatory literacy tool synthesizing official statutory text from Law No. 22 of 2009 (UU No. 22 Tahun 2009). Responses are generated from retrieved document context and do not constitute legal advice. For formal legal proceedings, consult the official State Gazette of the Republic of Indonesia and licensed legal practitioners.
+
