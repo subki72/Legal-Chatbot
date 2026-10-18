@@ -67,16 +67,17 @@ def test_get_llm_factory_groq():
     mock_module = MagicMock()
     mock_module.Groq = mock_groq_cls
 
+    dummy_key = "dummy_mock_groq_key"
     with patch("app.config.settings.LLM_PROVIDER", "groq"), patch(
         "app.config.settings.LLM_MODEL", "llama-3.3-70b-versatile"
-    ), patch("app.config.settings.GROQ_API_KEY", "gsk_test_mock_key_123"), patch.dict(
+    ), patch("app.config.settings.GROQ_API_KEY", dummy_key), patch.dict(
         "sys.modules", {"llama_index.llms.groq": mock_module}
     ):
         llm = get_llm()
         assert llm is not None
         mock_groq_cls.assert_called_once_with(
             model="llama-3.3-70b-versatile",
-            api_key="gsk_test_mock_key_123",
+            api_key=dummy_key,
         )
 
 

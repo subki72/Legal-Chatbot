@@ -43,6 +43,11 @@ jobs:
         run: |
           docker compose config --quiet
 
+      - name: Lint with Ruff
+        run: |
+          pip install ruff
+          ruff check .
+
       - name: Execute Pytest Suite (Unit & Evaluation Tests)
         env:
           APP_API_KEY: "ci-test-secret-key-123"
@@ -52,3 +57,14 @@ jobs:
           CHROMA_PORT: "8000"
         run: |
           pytest tests/ -v
+
+      - name: Build Docker Container Image
+        run: |
+          docker build -t legal-chatbot:smoke .
+
+      - name: Scan container image with Trivy for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'legal-chatbot:smoke'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'

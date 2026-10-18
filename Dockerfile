@@ -1,0 +1,36 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# 1. Install System Libs
+RUN apt-get update && apt-get install -y build-essential --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+# 2. Upgrade pip & Install PyTorch CPU with PyPI fallback
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch --extra-index-url https://download.pytorch.org/whl/cpu
+
+# 3. Copy dedicated backend requirements & install
+COPY backend/requirements.txt ./requirements.txt
+RUN pip install --default-timeout=4000 --no-cache-dir -r requirements.txt
+
+# 4. Create unprivileged appuser (Non-Root Hardening)
+RUN groupadd -g 1000 appuser && \
+    useradd -u 1000 -g appuser -m -s /bin/bash appuser && \
+    mkdir -p /home/appuser/.cache/huggingface /home/appuser/.cache/llama_index && \
+    chown -R appuser:appuser /app /home/appuser
+
+# 5. Copy backend source and dataset
+COPY --chown=appuser:appuser backend/ ./backend/
+COPY --chown=appuser:appuser Data/ ./Data/
+
+ENV PYTHONPATH=/app/backend
+ENV HOME=/home/appuser
+ENV HF_HUB_DISABLE_XET=1
+ENV HF_HOME=/home/appuser/.cache/huggingface
+ENV LLAMA_INDEX_CACHE_DIR=/home/appuser/.cache/llama_index
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["python", "backend/main.py"]
