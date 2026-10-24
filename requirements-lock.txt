@@ -1,5 +1,5 @@
 # Locked dependencies for Legal-Chatbot
-fastapi==0.115.6
+fastapi==0.156.4
 uvicorn==0.34.0
 streamlit==1.41.1
 python-dotenv==1.0.1
