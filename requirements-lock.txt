@@ -8,7 +8,7 @@ llama-index-core==0.11.23
 llama-index-llms-groq==0.2.1
 llama-index-llms-ollama==0.3.1
 llama-index-embeddings-huggingface==0.3.1
-llama-index-vector-stores-chroma==0.2.2
+llama-index-vector-stores-chroma==0.6.0
 sentence-transformers==3.3.1
 pypdf==5.1.0
 requests==2.32.3
